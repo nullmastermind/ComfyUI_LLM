@@ -3,6 +3,24 @@ import subprocess
 
 from rich import print
 
+
+def copy_file_to_container(container_id, file_path):
+    # Remove leading ./ if present and join with target directory
+    cleaned_path = os.path.normpath(file_path).lstrip("./\\")
+    target_dir = os.path.join(
+        "/app/custom_nodes/ComfyUI_LLM", os.path.dirname(cleaned_path)
+    )
+
+    print("target_dir:", target_dir)
+
+    dir_cmd = f"docker exec {container_id} mkdir -p {target_dir}"
+    subprocess.run(dir_cmd, shell=True, check=True)
+
+    # Copy file to container
+    cmd = f"docker cp {file_path} {container_id}:{target_dir}"
+    subprocess.run(cmd, shell=True, check=True)
+
+
 if __name__ == "__main__":
     # Export requirements.txt from poetry
     subprocess.run(
@@ -47,3 +65,15 @@ if __name__ == "__main__":
     if confirmation != "yes":
         print("Deployment cancelled.")
         exit()
+
+    # Copy each file to the container
+    print("\n[bold]Deploying files...[/bold]")
+    for file_path in file_list:
+        try:
+            print(f"Copying {file_path}...")
+            copy_file_to_container(container_id, file_path)
+        except subprocess.CalledProcessError as e:
+            print(f"[red]Error copying {file_path}: {e}[/red]")
+            exit(1)
+
+    print("[green]Deployment completed successfully![/green]")
