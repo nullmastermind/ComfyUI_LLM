@@ -18,13 +18,13 @@ class AnyToString:
     RETURN_TYPES = ("STRING",)
     RETURN_NAMES = ("text",)
 
-    FUNCTION = "tts"
+    FUNCTION = "execute"
 
     OUTPUT_NODE = True
 
     CATEGORY = "LLM/Converts"
 
-    def tts(self, **kwargs):
+    def execute(self, **kwargs):
         input_any = kwargs.get("any")
 
         if input_any is None:
