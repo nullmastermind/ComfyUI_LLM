@@ -44,7 +44,7 @@ if __name__ == "__main__":
     container_id = None
 
     for line in lines:
-        if "comfyui-comfyui" in line:
+        if "->8188/tcp" in line:
             container_id = line.split(" ")[0].strip()
 
     if not container_id:
