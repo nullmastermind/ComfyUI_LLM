@@ -4,13 +4,14 @@ import subprocess
 import requests
 from rich import print
 
+remove_dirs = ["/app/custom_nodes/ComfyUI_LLM"]
+root_app = "/app"
+
 
 def copy_file_to_container(container_id, file_path):
     # Remove leading ./ if present and join with target directory
     cleaned_path = os.path.normpath(file_path).lstrip("./\\")
-    target_dir = os.path.join(
-        "/app/custom_nodes/ComfyUI_LLM", os.path.dirname(cleaned_path)
-    )
+    target_dir = os.path.join("/app", os.path.dirname(cleaned_path))
 
     print("target_dir:", target_dir)
 
@@ -31,7 +32,7 @@ if __name__ == "__main__":
             "-f",
             "requirements.txt",
             "--output",
-            "requirements.txt",
+            "custom_nodes/ComfyUI_LLM/requirements.txt",
             "--without-hashes",
         ],
         check=True,
@@ -69,17 +70,18 @@ if __name__ == "__main__":
         print("Deployment cancelled.")
         exit()
 
-    # Remove existing directory in container
-    print("\n[bold]Removing existing directory...[/bold]")
-    try:
-        subprocess.run(
-            f"docker exec {container_id} rm -rf /app/custom_nodes/ComfyUI_LLM",
-            shell=True,
-            check=True,
-        )
-    except subprocess.CalledProcessError as e:
-        print(f"[red]Error removing existing directory: {e}[/red]")
-        exit(1)
+    # Remove existing directories in container
+    print("\n[bold]Removing existing directories...[/bold]")
+    for dir_path in remove_dirs:
+        try:
+            subprocess.run(
+                f"docker exec {container_id} rm -rf {dir_path}",
+                shell=True,
+                check=True,
+            )
+            print(f"Removed {dir_path}")
+        except:
+            pass
 
     # Copy each file to the container
     print("\n[bold]Deploying files...[/bold]")
