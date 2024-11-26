@@ -1,3 +1,4 @@
+from .converts.any_to_string import AnyToString
 from .inputs.input_text import InputText
 from .inputs.openai_model_node import OpenAIModelNode
 from .outputs.output_text import OutputText
@@ -8,6 +9,7 @@ NODE_CLASS_MAPPINGS = {
     "OpenAI Model": OpenAIModelNode,
     "Output Text": OutputText,
     "Input Text": InputText,
+    "Any To Text": AnyToString,
 }
 
 __all__ = ["NODE_CLASS_MAPPINGS"]
