@@ -1,4 +1,5 @@
 import os
+import shutil
 import subprocess
 
 import requests
@@ -102,3 +103,8 @@ if __name__ == "__main__":
     except requests.exceptions.RequestException:
         pass
     print("[green]ComfyUI restart initiated successfully![/green]")
+    # Delete local web directory
+    try:
+        shutil.rmtree("./web")
+    except:
+        pass
