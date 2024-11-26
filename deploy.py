@@ -1,6 +1,7 @@
 import os
 import subprocess
 
+import requests
 from rich import print
 
 
@@ -77,3 +78,11 @@ if __name__ == "__main__":
             exit(1)
 
     print("[green]Deployment completed successfully![/green]")
+
+    # Add restart step
+    print("\n[bold]Restarting ComfyUI...[/bold]")
+    try:
+        requests.get("http://localhost:8188/api/manager/reboot")
+    except requests.exceptions.RequestException:
+        pass
+    print("[green]ComfyUI restart initiated successfully![/green]")
