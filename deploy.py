@@ -62,10 +62,24 @@ if __name__ == "__main__":
     for file_path in file_list:
         print(f"└── {file_path}")
     # Ask for confirmation before proceeding
-    confirmation = input("Do you want to proceed with deployment? (yes/no): ").lower()
-    if confirmation != "yes" and confirmation != "y":
+    confirmation = input("Do you want to proceed with deployment? ([y]/n): ").lower()
+    if confirmation == "" or confirmation == "yes" or confirmation == "y":
+        pass
+    else:
         print("Deployment cancelled.")
         exit()
+
+    # Remove existing directory in container
+    print("\n[bold]Removing existing directory...[/bold]")
+    try:
+        subprocess.run(
+            f"docker exec {container_id} rm -rf /app/custom_nodes/ComfyUI_LLM",
+            shell=True,
+            check=True,
+        )
+    except subprocess.CalledProcessError as e:
+        print(f"[red]Error removing existing directory: {e}[/red]")
+        exit(1)
 
     # Copy each file to the container
     print("\n[bold]Deploying files...[/bold]")
