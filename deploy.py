@@ -62,7 +62,7 @@ if __name__ == "__main__":
         print(f"└── {file_path}")
     # Ask for confirmation before proceeding
     confirmation = input("Do you want to proceed with deployment? (yes/no): ").lower()
-    if confirmation != "yes":
+    if confirmation != "yes" and confirmation != "y":
         print("Deployment cancelled.")
         exit()
 
