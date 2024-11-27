@@ -1,5 +1,5 @@
 class OpenAIModelNode:
-    CATEGORY = "LLM/Inputs"
+    CATEGORY = "LLM/inputs"
     RETURN_TYPES = ("LLM_OPENAI_MODEL",)
     FUNCTION = "execute"
     OUTPUT_NODE = False

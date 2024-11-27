@@ -1,5 +1,5 @@
 class OutputText:
-    CATEGORY = "LLM/Outputs"
+    CATEGORY = "LLM/outputs"
     RETURN_TYPES = ("STRING",)
     FUNCTION = "execute"
     OUTPUT_NODE = True

@@ -22,7 +22,7 @@ class AnyToString:
 
     OUTPUT_NODE = True
 
-    CATEGORY = "LLM/Converts"
+    CATEGORY = "LLM/converts"
 
     def execute(self, **kwargs):
         input_any = kwargs.get("any")
