@@ -1,6 +1,7 @@
 class OutputText:
     CATEGORY = "LLM/outputs"
     RETURN_TYPES = ("STRING",)
+    RETURN_NAMES = ("text",)
     FUNCTION = "execute"
     OUTPUT_NODE = True
     INPUT_IS_LIST = True

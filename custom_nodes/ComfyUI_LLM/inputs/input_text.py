@@ -1,6 +1,7 @@
 class InputText:
     CATEGORY = "LLM/inputs"
     RETURN_TYPES = ("STRING",)
+    RETURN_NAMES = ("text",)
     FUNCTION = "execute"
     OUTPUT_NODE = True
 
