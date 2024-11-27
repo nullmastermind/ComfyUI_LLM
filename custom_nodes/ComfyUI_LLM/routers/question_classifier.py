@@ -11,7 +11,7 @@ from custom_nodes.ComfyUI_LLM.route_data import RouteData, get_node_id, is_stopp
 
 
 class QuestionClassifier:
-    MAX_QUESTIONS = 3
+    MAX_QUESTIONS = 6
     CATEGORY = "LLM/routers"
     RETURN_TYPES = ("ROUTE_DATA", "STRING") + tuple(
         "ROUTE_DATA" for _ in range(MAX_QUESTIONS)
