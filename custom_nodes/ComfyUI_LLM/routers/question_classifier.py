@@ -107,7 +107,7 @@ class QuestionClassifier:
         )
         result_text = response.choices[0].message.content
 
-        print(f"result_text: {result_text}")
+        # print(f"result_text: {result_text}")
 
         category_name = classes[0]["category_name"]
         category_id = classes[0]["category_id"]
@@ -131,7 +131,7 @@ class QuestionClassifier:
         finally:
             pass
 
-        print(f"assistant_message: {category_name} {category_id}")
+        # print(f"assistant_message: {category_name} {category_id}")
 
         # Store questions and model in route_data variables
         route_data.variables[node_id] = {
@@ -143,8 +143,20 @@ class QuestionClassifier:
             },
         }
 
-        # Return route_data and all questions
-        return tuple(route_data.to_json() for _ in range(self.MAX_QUESTIONS))
+        return tuple(
+            (
+                route_data.to_json()
+                if questions[f"question_{i+1}"] == category_name
+                else RouteData(
+                    stop=True,
+                    conversation_id=route_data.conversation_id,
+                    messages=route_data.messages,
+                    query=route_data.query,
+                    variables=route_data.variables,
+                ).to_json()
+            )
+            for i in range(self.MAX_QUESTIONS)
+        )
 
 
 QUESTION_CLASSIFIER_SYSTEM_PROMPT = """
