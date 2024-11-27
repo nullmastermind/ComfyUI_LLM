@@ -9,6 +9,7 @@ class RouteData:
     conversation_id: str = dataclasses.field(default_factory=lambda: str(uuid.uuid4()))
     messages: list[dict] = dataclasses.field(default_factory=list)
     query: str = ""
+    variables: dict = dataclasses.field(default_factory=dict)
 
     @classmethod
     def from_json(cls, json_str: str) -> "RouteData":
@@ -20,6 +21,7 @@ class RouteData:
             conversation_id=route_data.get("conversation_id", str(uuid.uuid4())),
             messages=route_data.get("messages", []),
             query=route_data.get("query", ""),
+            variables=route_data.get("variables", {}),
         )
 
     def to_json(self) -> str:
@@ -30,8 +32,13 @@ class RouteData:
                     "conversation_id": self.conversation_id,
                     "messages": self.messages,
                     "query": self.query,
+                    "variables": self.variables,
                 }
             },
             indent=2,
             ensure_ascii=False,
         )
+
+
+def get_node_id(node_id: str | None = None) -> str:
+    return node_id if node_id else str(uuid.uuid4())

@@ -1,10 +1,18 @@
 from openai import OpenAI
 
+from custom_nodes.ComfyUI_LLM.data import RouteData, get_node_id
+
 
 class OpenAINode:
     CATEGORY = "LLM"
-    RETURN_TYPES = ("STRING",)
-    RETURN_NAMES = ("Assistant message",)
+    RETURN_TYPES = (
+        "ROUTE_DATA",
+        "STRING",
+    )
+    RETURN_NAMES = (
+        ">",
+        "answer",
+    )
     FUNCTION = "execute"
     OUTPUT_NODE = True
 
@@ -12,13 +20,14 @@ class OpenAINode:
     def INPUT_TYPES(cls):
         return {
             "required": {
-                "conversation_id": ("STRING", {"default": "", "defaultInput": True}),
+                "route_data_json": ("ROUTE_DATA", {"requireInput": True}),
+                "node_id": ("STRING", {"default": ""}),
                 "model_config": ("LLM_OPENAI_MODEL",),
                 "system_prompt": (
                     "STRING",
                     {"multiline": True, "default": "You are a helpful assistant."},
                 ),
-                "user_prompt": (
+                "query": (
                     "STRING",
                     {"multiline": True, "defaultInput": True},
                 ),
@@ -27,8 +36,23 @@ class OpenAINode:
         }
 
     def execute(
-        self, conversation_id, model_config, user_prompt, system_prompt, stream
+        self,
+        route_data_json,
+        node_id,
+        model_config,
+        query,
+        system_prompt,
+        stream,
     ):
+        route_data = RouteData.from_json(route_data_json)
+        node_id = get_node_id(node_id)
+
+        if route_data.stop:
+            return (
+                route_data.to_json(),
+                "",
+            )
+
         # Initialize OpenAI client with provided configuration
         client = OpenAI(
             api_key=model_config["api_key"], base_url=model_config["base_url"]
@@ -41,14 +65,31 @@ class OpenAINode:
                 temperature=model_config["temperature"],
                 messages=[
                     {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": user_prompt},
+                    {"role": "user", "content": query},
                 ],
                 # stream=stream,
             )
 
             assistant_message = response.choices[0].message.content
-            return (assistant_message,)
+
+            route_data.variables[node_id] = {
+                "answer": assistant_message,
+            }
+
+            return (
+                route_data.to_json(),
+                assistant_message,
+            )
 
         except Exception as e:
             print(f"Error calling OpenAI API: {str(e)}")
-            return ("Error: " + str(e),)
+
+            route_data.stop = True
+            route_data.variables[node_id] = {
+                "answer": "Error: " + str(e),
+            }
+
+            return (
+                route_data.to_json(),
+                "Error: " + str(e),
+            )
