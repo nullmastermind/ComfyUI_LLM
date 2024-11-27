@@ -66,24 +66,6 @@ class QuestionClassifier:
                     }
                 )
 
-        print("========================")
-        print(
-            build_prompt(
-                template=QUESTION_CLASSIFIER_SYSTEM_PROMPT,
-                variables={
-                    "histories": (
-                        get_history_prompt_text(
-                            route_data.messages,
-                            include_assistant=False,
-                        )
-                        if memory
-                        else ""
-                    ),
-                },
-            )
-        )
-        print("========================")
-
         # Call OpenAI API
         client = OpenAI(api_key=model["api_key"], base_url=model["base_url"])
         response = client.chat.completions.create(
@@ -96,9 +78,7 @@ class QuestionClassifier:
                         template=QUESTION_CLASSIFIER_SYSTEM_PROMPT,
                         variables={
                             "histories": (
-                                get_history_prompt_text(
-                                    route_data.messages, human_prefix="User"
-                                )
+                                get_history_prompt_text(route_data.messages)
                                 if memory
                                 else ""
                             ),
