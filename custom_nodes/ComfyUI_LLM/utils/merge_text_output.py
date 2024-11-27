@@ -9,9 +9,14 @@ class MergeTextOutput:
 
     @classmethod
     def INPUT_TYPES(cls) -> Dict[str, dict]:
-        return {"required": {}, "optional": {}}
+        return {
+            "required": {
+                "delimiter": ("STRING", {"default": "\\n", "multiline": False}),
+            },
+            "optional": {},
+        }
 
-    def run(self, **kw) -> Tuple[Any | None]:
-        value = "\n".join(v for v in kw.values() if v)
-
+    def run(self, delimiter: str, **kw) -> Tuple[Any | None]:
+        delimiter = delimiter.replace("\\n", "\n")
+        value = delimiter.join(v for v in kw.values() if v)
         return (value,)
