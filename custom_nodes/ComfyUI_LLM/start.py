@@ -31,9 +31,12 @@ class StartNode:
             messages=[],
         )
         node_id = get_node_id(node_id)
+        conversation_id = get_node_id(conversation_id)
+        route_data.conversation_id = conversation_id
 
         route_data.variables[node_id] = {
             "query": query,
+            "conversation_id": conversation_id,
         }
         route_data.prev_node_type = self.__class__.__name__
         route_data.prev_node_id = node_id

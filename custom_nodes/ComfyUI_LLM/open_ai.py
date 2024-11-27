@@ -1,3 +1,4 @@
+from jinja2 import Template
 from openai import OpenAI
 
 from custom_nodes.ComfyUI_LLM.route_data import RouteData, get_node_id, is_stopped
@@ -30,6 +31,7 @@ class OpenAINode:
                     {"multiline": True, "defaultInput": True},
                 ),
                 "stream": ("BOOLEAN", {"default": False}),
+                "use_jinja": ("BOOLEAN", {"default": False}),
             },
         }
 
@@ -41,6 +43,7 @@ class OpenAINode:
         query,
         system_prompt,
         stream,
+        use_jinja,
     ):
         route_data = RouteData.from_json(_in)
         node_id = get_node_id(node_id)
@@ -52,6 +55,10 @@ class OpenAINode:
                 route_data.to_json(),
                 "",
             )
+
+        if use_jinja:
+            system_prompt_template = Template(system_prompt)
+            system_prompt = system_prompt_template.render(**route_data.variables)
 
         # Initialize OpenAI client with provided configuration
         client = OpenAI(
