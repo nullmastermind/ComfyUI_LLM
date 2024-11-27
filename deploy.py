@@ -1,3 +1,5 @@
+import hashlib
+import json
 import os
 import shutil
 import subprocess
@@ -8,13 +10,49 @@ from rich import print
 remove_dirs = ["/app/custom_nodes/ComfyUI_LLM"]
 root_app = "/app"
 
+CACHE_DIR = "__deploy_cache__"
+CACHE_FILE = os.path.join(CACHE_DIR, "file_hashes.json")
+
+
+def calculate_file_hash(file_path):
+    """Calculate SHA256 hash of a file"""
+    sha256_hash = hashlib.sha256()
+    with open(file_path, "rb") as f:
+        for byte_block in iter(lambda: f.read(4096), b""):
+            sha256_hash.update(byte_block)
+    return sha256_hash.hexdigest()
+
+
+def load_cache():
+    """Load cached file hashes"""
+    if not os.path.exists(CACHE_FILE):
+        return {}
+    with open(CACHE_FILE, "r") as f:
+        return json.load(f)
+
+
+def save_cache(cache):
+    """Save file hashes to cache"""
+    os.makedirs(CACHE_DIR, exist_ok=True)
+    with open(CACHE_FILE, "w") as f:
+        json.dump(cache, f, indent=2)
+
 
 def copy_file_to_container(container_id, file_path):
+    # Load cache
+    cache = load_cache()
+    current_hash = calculate_file_hash(file_path)
+
+    # Skip if file hasn't changed
+    if file_path in cache and cache[file_path] == current_hash:
+        print(f"Skipping {file_path} (unchanged)")
+        return
+
     # Remove leading ./ if present and join with target directory
     cleaned_path = os.path.normpath(file_path).lstrip("./\\")
     target_dir = os.path.join("/app", os.path.dirname(cleaned_path))
 
-    print("target_dir:", target_dir)
+    print(f"Copying {file_path} (modified)...")
 
     dir_cmd = f"docker exec {container_id} mkdir -p {target_dir}"
     subprocess.run(dir_cmd, shell=True, check=True)
@@ -22,6 +60,10 @@ def copy_file_to_container(container_id, file_path):
     # Copy file to container
     cmd = f"docker cp {file_path} {container_id}:{target_dir}"
     subprocess.run(cmd, shell=True, check=True)
+
+    # Update cache
+    cache[file_path] = current_hash
+    save_cache(cache)
 
 
 if __name__ == "__main__":

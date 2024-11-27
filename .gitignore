@@ -1,3 +1,4 @@
 .idea
 custom_nodes/ComfyUI_LLM/requirements.txt
 /web
+/__deploy_cache__
