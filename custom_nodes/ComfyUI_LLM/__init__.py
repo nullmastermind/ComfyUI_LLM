@@ -4,6 +4,7 @@ from .inputs.openai_model_node import OpenAIModelNode
 from .open_ai import OpenAINode
 from .outputs.output_text import OutputText
 from .prompts.prompt_builder import PromptBuilder
+from .routers.question_classifier import QuestionClassifier
 from .start import StartNode
 
 WEB_DIRECTORY = "./web"
@@ -16,6 +17,7 @@ NODE_CLASS_MAPPINGS = {
     "Start": StartNode,
     "OpenAI": OpenAINode,
     "Prompt Builder": PromptBuilder,
+    "Question Classifier": QuestionClassifier,
 }
 
 __all__ = ["NODE_CLASS_MAPPINGS"]
