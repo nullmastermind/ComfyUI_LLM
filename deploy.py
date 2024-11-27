@@ -38,15 +38,8 @@ def save_cache(cache):
         json.dump(cache, f, indent=2)
 
 
-def copy_file_to_container(container_id, file_path):
-    # Load cache
-    cache = load_cache()
+def copy_file_to_container(container_id, file_path, cache):
     current_hash = calculate_file_hash(file_path)
-
-    # Skip if file hasn't changed
-    if file_path in cache and cache[file_path] == current_hash:
-        print(f"Skipping {file_path} (unchanged)")
-        return
 
     # Remove leading ./ if present and join with target directory
     cleaned_path = os.path.normpath(file_path).lstrip("./\\")
@@ -63,7 +56,6 @@ def copy_file_to_container(container_id, file_path):
 
     # Update cache
     cache[file_path] = current_hash
-    save_cache(cache)
 
 
 if __name__ == "__main__":
@@ -93,14 +85,26 @@ if __name__ == "__main__":
     if not container_id:
         raise Exception("Could not find ComfyUI container. Is it running?")
 
+    # Load cache
+    cache = load_cache()
+
     # Get all files recursively in current directory
     file_list = []
     for root, dirs, files in os.walk("."):
-        if ".git" in root or ".idea" in root:
+        # Skip directories that shouldn't be deployed
+        excluded_dirs = {".git", ".idea", "__deploy_cache__", "deploy.py"}
+        if any(excluded in root for excluded in excluded_dirs):
             continue
         for file in files:
             file_path = os.path.join(root, file)
-            file_list.append(file_path)
+            current_hash = calculate_file_hash(file_path)
+            # Skip if file hasn't changed
+            if file_path not in cache or cache[file_path] != current_hash:
+                file_list.append(file_path)
+
+    if len(file_list) == 0:
+        print("No files have changed. Nothing to deploy.")
+        exit()
 
     print("[bold]Files to deploy:[/bold]")
     for file_path in file_list:
@@ -131,10 +135,11 @@ if __name__ == "__main__":
     for file_path in file_list:
         try:
             print(f"Copying {file_path}...")
-            copy_file_to_container(container_id, file_path)
+            copy_file_to_container(container_id, file_path, cache)
         except subprocess.CalledProcessError as e:
             print(f"[red]Error copying {file_path}: {e}[/red]")
             exit(1)
+    save_cache(cache)
 
     print("[green]Deployment completed successfully![/green]")
 
