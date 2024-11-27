@@ -75,7 +75,7 @@ class OpenAINode:
                 temperature=model_config["temperature"],
                 messages=[
                     {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": query},
+                    *route_data.messages,  # Include all previous messages from history
                 ],
                 # stream=stream,
             )

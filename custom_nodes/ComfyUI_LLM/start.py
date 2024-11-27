@@ -1,3 +1,5 @@
+import json
+
 from custom_nodes.ComfyUI_LLM.route_data import RouteData, get_node_id
 
 
@@ -21,18 +23,30 @@ class StartNode:
                         "multiline": True,
                     },
                 ),
+                "chat_history": (
+                    "STRING",
+                    {
+                        "default": "[]",
+                        "multiline": True,
+                    },
+                ),
             },
         }
 
-    def execute(self, node_id, conversation_id, query):
+    def execute(self, node_id, conversation_id, query, chat_history):
         route_data = RouteData(
             stop=False,
             query=query,
-            messages=[],
         )
         node_id = get_node_id(node_id)
         conversation_id = get_node_id(conversation_id)
         route_data.conversation_id = conversation_id
+
+        try:
+            route_data.messages = json.loads(chat_history)
+        except json.JSONDecodeError:
+            print(f"Warning: Invalid JSON in chat_history. Using empty list instead.")
+            route_data.messages = []
 
         route_data.variables[node_id] = {
             "query": query,
