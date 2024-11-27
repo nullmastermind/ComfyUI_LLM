@@ -21,7 +21,7 @@ class OpenAINode:
             "required": {
                 "_in": ("ROUTE_DATA", {"requireInput": True}),
                 "node_id": ("STRING", {"default": ""}),
-                "model_config": ("LLM_OPENAI_MODEL",),
+                "model": ("LLM_OPENAI_MODEL",),
                 "system_prompt": (
                     "STRING",
                     {
@@ -44,7 +44,7 @@ class OpenAINode:
         self,
         _in,
         node_id,
-        model_config,
+        model,
         query,
         system_prompt,
         stream,
@@ -69,9 +69,7 @@ class OpenAINode:
             query = query_template.render(**route_data.variables)
 
         # Initialize OpenAI client with provided configuration
-        client = OpenAI(
-            api_key=model_config["api_key"], base_url=model_config["base_url"]
-        )
+        client = OpenAI(api_key=model["api_key"], base_url=model["base_url"])
 
         # update history
         route_data.messages.append({"role": "user", "content": query})
@@ -79,8 +77,8 @@ class OpenAINode:
         try:
             # Call OpenAI API
             response = client.chat.completions.create(
-                model=model_config["model"],
-                temperature=model_config["temperature"],
+                model=model["model"],
+                temperature=model["temperature"],
                 messages=[
                     {"role": "system", "content": system_prompt},
                     *(
