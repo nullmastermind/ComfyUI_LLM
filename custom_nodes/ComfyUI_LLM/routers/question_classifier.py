@@ -5,6 +5,7 @@ from openai import OpenAI
 from custom_nodes.ComfyUI_LLM.helper.json_in_md_parser import (
     parse_and_check_json_markdown,
 )
+from custom_nodes.ComfyUI_LLM.helper.memory import get_history_prompt_text
 from custom_nodes.ComfyUI_LLM.helper.utils import build_prompt
 from custom_nodes.ComfyUI_LLM.route_data import RouteData, get_node_id, is_stopped
 
@@ -36,15 +37,15 @@ class QuestionClassifier:
                     "STRING",
                     {"default": "", "multiline": True},
                 ),
+                "memory": ("BOOLEAN", {"default": True}),
                 **{
                     f"question_{i+1}": ("STRING", {"default": "", "multiline": True})
                     for i in range(cls.MAX_QUESTIONS)
                 },
-                "memory": ("BOOLEAN", {"default": True}),
             }
         }
 
-    def execute(self, _in, node_id, query, model, instructions, **questions):
+    def execute(self, _in, node_id, query, model, instructions, memory, **questions):
         route_data = RouteData.from_json(_in)
         node_id = get_node_id(node_id)
         route_data.prev_node_type = self.__class__.__name__
@@ -65,6 +66,23 @@ class QuestionClassifier:
                     }
                 )
 
+        print("========================")
+        print(
+            build_prompt(
+                template=QUESTION_CLASSIFIER_SYSTEM_PROMPT,
+                variables={
+                    "histories": (
+                        get_history_prompt_text(
+                            route_data.messages, human_prefix="User"
+                        )
+                        if memory
+                        else ""
+                    ),
+                },
+            )
+        )
+        print("========================")
+
         # Call OpenAI API
         client = OpenAI(api_key=model["api_key"], base_url=model["base_url"])
         response = client.chat.completions.create(
@@ -76,7 +94,13 @@ class QuestionClassifier:
                     "content": build_prompt(
                         template=QUESTION_CLASSIFIER_SYSTEM_PROMPT,
                         variables={
-                            "history": "",
+                            "histories": (
+                                get_history_prompt_text(
+                                    route_data.messages, human_prefix="User"
+                                )
+                                if memory
+                                else ""
+                            ),
                         },
                     ),
                 },
