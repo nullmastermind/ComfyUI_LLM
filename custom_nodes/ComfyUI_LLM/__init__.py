@@ -6,6 +6,7 @@ from .outputs.output_text import OutputText
 from .prompts.prompt_builder import PromptBuilder
 from .routers.question_classifier import QuestionClassifier
 from .start import StartNode
+from .utils.merge_text_output import MergeTextOutput
 
 WEB_DIRECTORY = "./web"
 
@@ -18,11 +19,13 @@ NODE_CLASS_MAPPINGS = {
     "OpenAI": OpenAINode,
     "Prompt Builder": PromptBuilder,
     "Question Classifier": QuestionClassifier,
+    "Dynamic STRING MergeTextOutput": MergeTextOutput,
     # "Dynamic IMAGE Node": DynamicNode,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
     # "Dynamic IMAGE Node": "Dynamic Node",
+    "Dynamic STRING MergeTextOutput": "Merge Text",
 }
 
 __all__ = ["NODE_CLASS_MAPPINGS", "NODE_DISPLAY_NAME_MAPPINGS"]
