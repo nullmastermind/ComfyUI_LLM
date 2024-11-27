@@ -34,7 +34,7 @@ class PromptBuilder:
         prompt_template = Template(prompt)
         prompt = prompt_template.render(**route_data.variables)
 
-        route_data.variables["prompt"] = {"prompt": prompt}
+        route_data.variables[node_id] = {"prompt": prompt}
 
         return (
             route_data.to_json(),
