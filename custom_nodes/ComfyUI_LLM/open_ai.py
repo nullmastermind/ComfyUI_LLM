@@ -24,14 +24,19 @@ class OpenAINode:
                 "model_config": ("LLM_OPENAI_MODEL",),
                 "system_prompt": (
                     "STRING",
-                    {"multiline": True, "default": "You are a helpful assistant."},
+                    {
+                        "multiline": True,
+                        "default": "You are a helpful assistant.",
+                        "defaultInput": True,
+                    },
                 ),
                 "query": (
                     "STRING",
                     {"multiline": True, "defaultInput": True},
                 ),
                 "stream": ("BOOLEAN", {"default": False}),
-                "use_jinja": ("BOOLEAN", {"default": False}),
+                "jinja": ("BOOLEAN", {"default": False}),
+                "memory": ("BOOLEAN", {"default": True}),
             },
         }
 
@@ -43,7 +48,8 @@ class OpenAINode:
         query,
         system_prompt,
         stream,
-        use_jinja,
+        jinja,
+        memory,
     ):
         route_data = RouteData.from_json(_in)
         node_id = get_node_id(node_id)
@@ -56,9 +62,11 @@ class OpenAINode:
                 "",
             )
 
-        if use_jinja:
+        if jinja:
             system_prompt_template = Template(system_prompt)
             system_prompt = system_prompt_template.render(**route_data.variables)
+            query_template = Template(query)
+            query = query_template.render(**route_data.variables)
 
         # Initialize OpenAI client with provided configuration
         client = OpenAI(
@@ -75,7 +83,11 @@ class OpenAINode:
                 temperature=model_config["temperature"],
                 messages=[
                     {"role": "system", "content": system_prompt},
-                    *route_data.messages,  # Include all previous messages from history
+                    *(
+                        route_data.messages
+                        if memory
+                        else [{"role": "user", "content": query}]
+                    ),
                 ],
                 # stream=stream,
             )
