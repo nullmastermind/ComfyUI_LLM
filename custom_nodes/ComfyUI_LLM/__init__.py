@@ -18,14 +18,15 @@ NODE_CLASS_MAPPINGS = {
     "Start": StartNode,
     "OpenAI": OpenAINode,
     "Prompt Builder": PromptBuilder,
-    "Question Classifier": QuestionClassifier,
     "--dynamic --type=STRING --label=text MergeTextOutput": MergeTextOutput,
+    "--dynamic --type=STRING --label=question QuestionClassifier": QuestionClassifier,
     # "Dynamic IMAGE Node": DynamicNode,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
     # "Dynamic IMAGE Node": "Dynamic Node",
     "--dynamic --type=STRING --label=text MergeTextOutput": "Merge Text",
+    "--dynamic --type=STRING --label=question QuestionClassifier": "Question Classifier",
 }
 
 __all__ = ["NODE_CLASS_MAPPINGS", "NODE_DISPLAY_NAME_MAPPINGS"]

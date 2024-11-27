@@ -39,10 +39,6 @@ class QuestionClassifier:
                     {"default": "", "multiline": True},
                 ),
                 "memory": ("BOOLEAN", {"default": True}),
-                **{
-                    f"question_{i+1}": ("STRING", {"default": "", "multiline": True})
-                    for i in range(cls.MAX_QUESTIONS)
-                },
             }
         }
 
