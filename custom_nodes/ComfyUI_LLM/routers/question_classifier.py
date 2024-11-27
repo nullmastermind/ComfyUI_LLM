@@ -73,7 +73,8 @@ class QuestionClassifier:
                 variables={
                     "histories": (
                         get_history_prompt_text(
-                            route_data.messages, human_prefix="User"
+                            route_data.messages,
+                            include_assistant=False,
                         )
                         if memory
                         else ""
