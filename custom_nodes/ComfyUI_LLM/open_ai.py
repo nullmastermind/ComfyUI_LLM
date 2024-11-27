@@ -4,6 +4,7 @@ from openai import OpenAI
 class OpenAINode:
     CATEGORY = "LLM"
     RETURN_TYPES = ("STRING",)
+    RETURN_NAMES = ("Assistant message",)
     FUNCTION = "execute"
     OUTPUT_NODE = True
 
