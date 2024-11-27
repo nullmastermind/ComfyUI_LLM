@@ -1,5 +1,6 @@
 from jinja2 import Template
 
+from custom_nodes.ComfyUI_LLM.constant import IN_ICON
 from custom_nodes.ComfyUI_LLM.route_data import RouteData, is_stopped, get_node_id
 
 
@@ -13,13 +14,17 @@ class PromptBuilder:
     def INPUT_TYPES(cls):
         return {
             "required": {
-                "_in": ("ROUTE_DATA", {"requireInput": True}),
+                IN_ICON: ("ROUTE_DATA", {"requireInput": True}),
                 "node_id": ("STRING", {"default": ""}),
                 "prompt": ("STRING", {"multiline": True, "default": ""}),
             }
         }
 
-    def execute(self, _in, node_id, prompt):
+    def execute(self, **kwargs):
+        _in = kwargs[IN_ICON]
+        node_id = kwargs["node_id"]
+        prompt = kwargs["prompt"]
+
         route_data = RouteData.from_json(_in)
         node_id = get_node_id(node_id)
         route_data.prev_node_type = self.__class__.__name__

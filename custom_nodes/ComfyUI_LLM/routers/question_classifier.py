@@ -2,6 +2,7 @@ import json
 
 from openai import OpenAI
 
+from custom_nodes.ComfyUI_LLM.constant import OUT_ICON, IN_ICON
 from custom_nodes.ComfyUI_LLM.helper.json_in_md_parser import (
     parse_and_check_json_markdown,
 )
@@ -16,8 +17,8 @@ class QuestionClassifier:
     RETURN_TYPES = ("ROUTE_DATA", "STRING") + tuple(
         "ROUTE_DATA" for _ in range(MAX_QUESTIONS)
     )
-    RETURN_NAMES = ("_out", "class") + tuple(
-        f"question_{i+1}" for i in range(MAX_QUESTIONS)
+    RETURN_NAMES = (OUT_ICON, "class") + tuple(
+        f"{i+1} {OUT_ICON}" for i in range(MAX_QUESTIONS)
     )
     FUNCTION = "execute"
     OUTPUT_NODE = True
@@ -26,7 +27,7 @@ class QuestionClassifier:
     def INPUT_TYPES(cls):
         return {
             "required": {
-                "_in": ("ROUTE_DATA", {"requireInput": True}),
+                IN_ICON: ("ROUTE_DATA", {"requireInput": True}),
                 "node_id": ("STRING", {"default": ""}),
                 "model": ("LLM_OPENAI_MODEL",),
                 "query": (
@@ -45,7 +46,15 @@ class QuestionClassifier:
             }
         }
 
-    def execute(self, _in, node_id, query, model, instructions, memory, **questions):
+    def execute(self, **kwargs):
+        # Extract required parameters from kwargs
+        _in = kwargs[IN_ICON]
+        node_id = kwargs["node_id"]
+        query = kwargs["query"]
+        model = kwargs["model"]
+        instructions = kwargs["instructions"]
+        memory = kwargs["memory"]
+
         route_data = RouteData.from_json(_in)
         node_id = get_node_id(node_id)
         route_data.prev_node_type = self.__class__.__name__
@@ -56,13 +65,15 @@ class QuestionClassifier:
                 route_data.to_json() for _ in range(self.MAX_QUESTIONS)
             )
 
+        # Extract questions from kwargs
         classes = []
         for i in range(self.MAX_QUESTIONS):
-            if questions[f"question_{i+1}"]:
+            question_key = f"question_{i+1}"
+            if question_key in kwargs and kwargs[question_key]:
                 classes.append(
                     {
                         "category_id": f"class_{i+1}",
-                        "category_name": questions[f"question_{i+1}"],
+                        "category_name": kwargs[question_key],
                     }
                 )
 
@@ -147,7 +158,7 @@ class QuestionClassifier:
             "model": model,
             "query": query,
             **{
-                f"question_{i+1}": questions[f"question_{i+1}"]
+                f"question_{i+1}": kwargs.get(f"question_{i+1}", "")
                 for i in range(self.MAX_QUESTIONS)
             },
             "class": category_name,
@@ -159,7 +170,7 @@ class QuestionClassifier:
             *(
                 (
                     route_data.to_json()
-                    if questions[f"question_{i+1}"] == category_name
+                    if kwargs.get(f"question_{i+1}", "") == category_name
                     else RouteData(
                         stop=True,
                         conversation_id=route_data.conversation_id,

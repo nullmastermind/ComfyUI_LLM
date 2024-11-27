@@ -1,12 +1,13 @@
 import json
 
+from custom_nodes.ComfyUI_LLM.constant import OUT_ICON
 from custom_nodes.ComfyUI_LLM.route_data import RouteData, get_node_id
 
 
 class StartNode:
     CATEGORY = "LLM"
     RETURN_TYPES = ("ROUTE_DATA", "STRING", "STRING")
-    RETURN_NAMES = ("out_", "conversation_id", "query")
+    RETURN_NAMES = (OUT_ICON, "conversation_id", "query")
     FUNCTION = "execute"
     OUTPUT_NODE = True
 

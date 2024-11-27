@@ -1,6 +1,7 @@
 from jinja2 import Template
 from openai import OpenAI
 
+from custom_nodes.ComfyUI_LLM.constant import OUT_ICON, IN_ICON
 from custom_nodes.ComfyUI_LLM.route_data import RouteData, get_node_id, is_stopped
 
 
@@ -11,7 +12,7 @@ class OpenAINode:
         "STRING",
         "STRING",
     )
-    RETURN_NAMES = ("out_", "answer", "system_prompt")
+    RETURN_NAMES = (OUT_ICON, "answer", "system_prompt")
     FUNCTION = "execute"
     OUTPUT_NODE = True
 
@@ -19,7 +20,7 @@ class OpenAINode:
     def INPUT_TYPES(cls):
         return {
             "required": {
-                "_in": ("ROUTE_DATA", {"requireInput": True}),
+                IN_ICON: ("ROUTE_DATA", {"requireInput": True}),
                 "node_id": ("STRING", {"default": ""}),
                 "model": ("LLM_OPENAI_MODEL",),
                 "system_prompt": (
@@ -40,17 +41,16 @@ class OpenAINode:
             },
         }
 
-    def execute(
-        self,
-        _in,
-        node_id,
-        model,
-        query,
-        system_prompt,
-        stream,
-        jinja,
-        memory,
-    ):
+    def execute(self, **kwargs):
+        # Extract required parameters from kwargs
+        _in = kwargs[IN_ICON]
+        node_id = kwargs["node_id"]
+        model = kwargs["model"]
+        query = kwargs["query"]
+        system_prompt = kwargs["system_prompt"]
+        jinja = kwargs["jinja"]
+        memory = kwargs["memory"]
+
         route_data = RouteData.from_json(_in)
         node_id = get_node_id(node_id)
         route_data.prev_node_type = self.__class__.__name__
