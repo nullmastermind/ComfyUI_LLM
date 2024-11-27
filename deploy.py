@@ -7,7 +7,8 @@ import subprocess
 import requests
 from rich import print
 
-remove_dirs = ["/app/custom_nodes/ComfyUI_LLM"]
+# remove_dirs = ["/app/custom_nodes/ComfyUI_LLM"]
+remove_dirs = []
 root_app = "/app"
 
 CACHE_DIR = "__deploy_cache__"
