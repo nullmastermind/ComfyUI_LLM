@@ -1,5 +1,4 @@
 import json
-import uuid
 
 from openai import OpenAI
 
@@ -13,8 +12,12 @@ from custom_nodes.ComfyUI_LLM.route_data import RouteData, get_node_id, is_stopp
 class QuestionClassifier:
     MAX_QUESTIONS = 3
     CATEGORY = "LLM/routers"
-    RETURN_TYPES = tuple("ROUTE_DATA" for _ in range(MAX_QUESTIONS))
-    RETURN_NAMES = tuple(f"question_{i+1}" for i in range(MAX_QUESTIONS))
+    RETURN_TYPES = ("ROUTE_DATA", "STRING") + tuple(
+        "ROUTE_DATA" for _ in range(MAX_QUESTIONS)
+    )
+    RETURN_NAMES = ("_out", "class") + tuple(
+        f"question_{i+1}" for i in range(MAX_QUESTIONS)
+    )
     FUNCTION = "execute"
     OUTPUT_NODE = True
 
@@ -56,7 +59,7 @@ class QuestionClassifier:
             if questions[f"question_{i+1}"]:
                 classes.append(
                     {
-                        "category_id": str(uuid.uuid4()),
+                        "category_id": f"class_{i+1}",
                         "category_name": questions[f"question_{i+1}"],
                     }
                 )
@@ -110,7 +113,7 @@ class QuestionClassifier:
         # print(f"result_text: {result_text}")
 
         category_name = classes[0]["category_name"]
-        category_id = classes[0]["category_id"]
+        # category_id = classes[0]["category_id"]
 
         try:
             result_text_json = parse_and_check_json_markdown(result_text, [])
@@ -125,7 +128,7 @@ class QuestionClassifier:
                 category_ids = [_class["category_id"] for _class in classes]
                 if category_id_result in category_ids:
                     category_name = classes_map[category_id_result]
-                    category_id = category_id_result
+                    # category_id = category_id_result
         except:
             pass
         finally:
@@ -141,21 +144,26 @@ class QuestionClassifier:
                 f"question_{i+1}": questions[f"question_{i+1}"]
                 for i in range(self.MAX_QUESTIONS)
             },
+            "class": category_name,
         }
 
-        return tuple(
-            (
-                route_data.to_json()
-                if questions[f"question_{i+1}"] == category_name
-                else RouteData(
-                    stop=True,
-                    conversation_id=route_data.conversation_id,
-                    messages=route_data.messages,
-                    query=route_data.query,
-                    variables=route_data.variables,
-                ).to_json()
-            )
-            for i in range(self.MAX_QUESTIONS)
+        return (
+            route_data.to_json(),
+            category_name,
+            *(
+                (
+                    route_data.to_json()
+                    if questions[f"question_{i+1}"] == category_name
+                    else RouteData(
+                        stop=True,
+                        conversation_id=route_data.conversation_id,
+                        messages=route_data.messages,
+                        query=route_data.query,
+                        variables=route_data.variables,
+                    ).to_json()
+                )
+                for i in range(self.MAX_QUESTIONS)
+            ),
         )
 
 
