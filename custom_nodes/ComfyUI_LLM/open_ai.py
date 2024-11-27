@@ -8,11 +8,9 @@ class OpenAINode:
     RETURN_TYPES = (
         "ROUTE_DATA",
         "STRING",
+        "STRING",
     )
-    RETURN_NAMES = (
-        "out_",
-        "answer",
-    )
+    RETURN_NAMES = ("out_", "answer", "system_prompt")
     FUNCTION = "execute"
     OUTPUT_NODE = True
 
@@ -60,6 +58,9 @@ class OpenAINode:
             api_key=model_config["api_key"], base_url=model_config["base_url"]
         )
 
+        # update history
+        route_data.messages.append({"role": "user", "content": query})
+
         try:
             # Call OpenAI API
             response = client.chat.completions.create(
@@ -76,11 +77,16 @@ class OpenAINode:
 
             route_data.variables[node_id] = {
                 "answer": assistant_message,
+                "system_prompt": system_prompt,
             }
+            route_data.messages.append(
+                {"role": "assistant", "content": assistant_message}
+            )
 
             return (
                 route_data.to_json(),
                 assistant_message,
+                system_prompt,
             )
 
         except Exception as e:
@@ -89,9 +95,11 @@ class OpenAINode:
             route_data.stop = True
             route_data.variables[node_id] = {
                 "answer": "Error: " + str(e),
+                "system_prompt": system_prompt,
             }
 
             return (
                 route_data.to_json(),
                 "Error: " + str(e),
+                system_prompt,
             )

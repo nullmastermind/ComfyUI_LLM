@@ -28,12 +28,7 @@ class StartNode:
         route_data = RouteData(
             stop=False,
             query=query,
-            messages=[
-                {
-                    "role": "user",
-                    "content": query,
-                }
-            ],
+            messages=[],
         )
         node_id = get_node_id(node_id)
 
