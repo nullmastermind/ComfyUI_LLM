@@ -11,6 +11,7 @@ class OpenAINode:
     def INPUT_TYPES(cls):
         return {
             "required": {
+                "conversation_id": ("STRING", {"default": "", "defaultInput": True}),
                 "model_config": ("LLM_OPENAI_MODEL",),
                 "system_prompt": (
                     "STRING",
@@ -18,13 +19,15 @@ class OpenAINode:
                 ),
                 "user_prompt": (
                     "STRING",
-                    {"multiline": True, "defaultInput": True, "label_on": True},
+                    {"multiline": True, "defaultInput": True},
                 ),
                 "stream": ("BOOLEAN", {"default": False}),
             },
         }
 
-    def execute(self, model_config, user_prompt, system_prompt, stream):
+    def execute(
+        self, conversation_id, model_config, user_prompt, system_prompt, stream
+    ):
         # Initialize OpenAI client with provided configuration
         client = OpenAI(
             api_key=model_config["api_key"], base_url=model_config["base_url"]
@@ -41,18 +44,6 @@ class OpenAINode:
                 ],
                 # stream=stream,
             )
-
-            # if stream:
-            #     # Collect streamed responses
-            #     full_response = ""
-            #     for chunk in response:
-            #         if chunk.choices[0].delta.content:
-            #             full_response += chunk.choices[0].delta.content
-            #     return (full_response,)
-            # else:
-            #     # Extract assistant's message (non-streaming)
-            #     assistant_message = response.choices[0].message.content
-            #     return (assistant_message,)
 
             assistant_message = response.choices[0].message.content
             return (assistant_message,)
