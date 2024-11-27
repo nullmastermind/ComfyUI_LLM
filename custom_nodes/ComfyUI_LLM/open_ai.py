@@ -1,6 +1,6 @@
 from openai import OpenAI
 
-from custom_nodes.ComfyUI_LLM.data import RouteData, get_node_id
+from custom_nodes.ComfyUI_LLM.route_data import RouteData, get_node_id, is_stopped
 
 
 class OpenAINode:
@@ -10,7 +10,7 @@ class OpenAINode:
         "STRING",
     )
     RETURN_NAMES = (
-        ">",
+        "out_",
         "answer",
     )
     FUNCTION = "execute"
@@ -20,7 +20,7 @@ class OpenAINode:
     def INPUT_TYPES(cls):
         return {
             "required": {
-                "route_data_json": ("ROUTE_DATA", {"requireInput": True}),
+                "_in": ("ROUTE_DATA", {"requireInput": True}),
                 "node_id": ("STRING", {"default": ""}),
                 "model_config": ("LLM_OPENAI_MODEL",),
                 "system_prompt": (
@@ -37,17 +37,19 @@ class OpenAINode:
 
     def execute(
         self,
-        route_data_json,
+        _in,
         node_id,
         model_config,
         query,
         system_prompt,
         stream,
     ):
-        route_data = RouteData.from_json(route_data_json)
+        route_data = RouteData.from_json(_in)
         node_id = get_node_id(node_id)
+        route_data.prev_node_type = self.__class__.__name__
+        route_data.prev_node_id = node_id
 
-        if route_data.stop:
+        if is_stopped(route_data):
             return (
                 route_data.to_json(),
                 "",

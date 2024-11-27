@@ -1,10 +1,10 @@
-from custom_nodes.ComfyUI_LLM.data import RouteData, get_node_id
+from custom_nodes.ComfyUI_LLM.route_data import RouteData, get_node_id
 
 
 class StartNode:
     CATEGORY = "LLM"
     RETURN_TYPES = ("ROUTE_DATA", "STRING", "STRING")
-    RETURN_NAMES = (">", "conversation_id", "query")
+    RETURN_NAMES = ("out_", "conversation_id", "query")
     FUNCTION = "execute"
     OUTPUT_NODE = True
 
@@ -35,10 +35,13 @@ class StartNode:
                 }
             ],
         )
+        node_id = get_node_id(node_id)
 
-        route_data.variables[get_node_id(node_id)] = {
+        route_data.variables[node_id] = {
             "query": query,
         }
+        route_data.prev_node_type = self.__class__.__name__
+        route_data.prev_node_id = node_id
 
         return (
             route_data.to_json(),

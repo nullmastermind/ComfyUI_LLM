@@ -10,6 +10,8 @@ class RouteData:
     messages: list[dict] = dataclasses.field(default_factory=list)
     query: str = ""
     variables: dict = dataclasses.field(default_factory=dict)
+    prev_node_type: str = ""
+    prev_node_id: str = ""
 
     @classmethod
     def from_json(cls, json_str: str) -> "RouteData":
@@ -22,6 +24,8 @@ class RouteData:
             messages=route_data.get("messages", []),
             query=route_data.get("query", ""),
             variables=route_data.get("variables", {}),
+            prev_node_id=route_data.get("prev_node_id", ""),
+            prev_node_type=route_data.get("prev_node_type", ""),
         )
 
     def to_json(self) -> str:
@@ -33,6 +37,8 @@ class RouteData:
                     "messages": self.messages,
                     "query": self.query,
                     "variables": self.variables,
+                    "prev_node_id": self.prev_node_id,
+                    "prev_node_type": self.prev_node_type,
                 }
             },
             indent=2,
@@ -42,3 +48,9 @@ class RouteData:
 
 def get_node_id(node_id: str | None = None) -> str:
     return node_id if node_id else str(uuid.uuid4())
+
+
+def is_stopped(route_data: RouteData) -> bool:
+    if route_data.stop:
+        return True
+    return False
