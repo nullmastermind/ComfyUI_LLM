@@ -73,67 +73,76 @@ class QuestionClassifier:
                     }
                 )
 
-        # Call OpenAI API
-        client = OpenAI(api_key=model["api_key"], base_url=model["base_url"])
-        response = client.chat.completions.create(
-            model=model["model"],
-            temperature=model["temperature"],
-            messages=[
-                {
-                    "role": "system",
-                    "content": build_prompt(
-                        template=QUESTION_CLASSIFIER_SYSTEM_PROMPT,
-                        variables={
-                            "histories": (
-                                get_history_prompt_text(route_data.messages)
-                                if memory
-                                else ""
-                            ),
-                        },
-                    ),
-                },
-                {
-                    "role": "user",
-                    "content": QUESTION_CLASSIFIER_USER_PROMPT_1,
-                },
-                {
-                    "role": "assistant",
-                    "content": QUESTION_CLASSIFIER_ASSISTANT_PROMPT_1,
-                },
-                {
-                    "role": "user",
-                    "content": QUESTION_CLASSIFIER_USER_PROMPT_2,
-                },
-                {
-                    "role": "assistant",
-                    "content": QUESTION_CLASSIFIER_ASSISTANT_PROMPT_2,
-                },
-                {
-                    "role": "user",
-                    "content": build_prompt(
-                        QUESTION_CLASSIFIER_USER_PROMPT_3,
-                        variables={
-                            "input_text": query,
-                            "categories": json.dumps(classes, ensure_ascii=False),
-                            "classification_instructions": instructions,
-                        },
-                    ),
-                },
-            ],
-        )
-        result_text = response.choices[0].message.content
+        try:
+            # Call OpenAI API
+            client = OpenAI(api_key=model["api_key"], base_url=model["base_url"])
+            response = client.chat.completions.create(
+                model=model["model"],
+                temperature=model["temperature"],
+                messages=[
+                    {
+                        "role": "system",
+                        "content": build_prompt(
+                            template=QUESTION_CLASSIFIER_SYSTEM_PROMPT,
+                            variables={
+                                "histories": (
+                                    get_history_prompt_text(route_data.messages)
+                                    if memory
+                                    else ""
+                                ),
+                            },
+                        ),
+                    },
+                    {
+                        "role": "user",
+                        "content": QUESTION_CLASSIFIER_USER_PROMPT_1,
+                    },
+                    {
+                        "role": "assistant",
+                        "content": QUESTION_CLASSIFIER_ASSISTANT_PROMPT_1,
+                    },
+                    {
+                        "role": "user",
+                        "content": QUESTION_CLASSIFIER_USER_PROMPT_2,
+                    },
+                    {
+                        "role": "assistant",
+                        "content": QUESTION_CLASSIFIER_ASSISTANT_PROMPT_2,
+                    },
+                    {
+                        "role": "user",
+                        "content": build_prompt(
+                            QUESTION_CLASSIFIER_USER_PROMPT_3,
+                            variables={
+                                "input_text": query,
+                                "categories": json.dumps(classes, ensure_ascii=False),
+                                "classification_instructions": instructions,
+                            },
+                        ),
+                    },
+                ],
+            )
+            result_text = response.choices[0].message.content
+        except Exception as e:
+            # Handle other unexpected errors
+            print(f"Unexpected error in QuestionClassifier: {str(e)}")
+            error_data = RouteData(
+                stop=True,
+                conversation_id=route_data.conversation_id,
+                messages=route_data.messages,
+                query=route_data.query,
+                variables=route_data.variables,
+            )
+            return (error_data.to_json(), "") + tuple(
+                error_data.to_json() for _ in range(self.MAX_QUESTIONS)
+            )
 
-        # print(f"result_text: {result_text}")
-
-        category_name = classes[0]["category_name"]
-        # category_id = classes[0]["category_id"]
+        # Default to first category in case of parsing failure
+        category_name = classes[0]["category_name"] if classes else ""
 
         try:
             result_text_json = parse_and_check_json_markdown(result_text, [])
-            if (
-                "category_name" in result_text_json
-                and "category_id" in result_text_json
-            ):
+            if result_text_json and "category_id" in result_text_json:
                 category_id_result = result_text_json["category_id"]
                 classes_map = {
                     class_["category_id"]: class_["category_name"] for class_ in classes
@@ -141,13 +150,10 @@ class QuestionClassifier:
                 category_ids = [_class["category_id"] for _class in classes]
                 if category_id_result in category_ids:
                     category_name = classes_map[category_id_result]
-                    # category_id = category_id_result
-        except:
-            pass
-        finally:
-            pass
 
-        # print(f"assistant_message: {category_name} {category_id}")
+        except Exception as e:
+            print(f"Error parsing classification result: {str(e)}")
+            # Continue with default category_name
 
         # Store questions and model in route_data variables
         route_data.variables[node_id] = {
