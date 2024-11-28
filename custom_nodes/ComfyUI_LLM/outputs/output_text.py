@@ -19,7 +19,11 @@ class OutputText:
             },
         }
 
-    def execute(self, text, unique_id=None, extra_pnginfo=None):
+    def execute(self, **kwargs):
+        text = kwargs.get("text")
+        unique_id = kwargs.get("unique_id")
+        extra_pnginfo = kwargs.get("extra_pnginfo")
+
         # Early return if no workflow info provided
         if unique_id is None or extra_pnginfo is None:
             return {"ui": {"text": text}, "result": (text,)}
