@@ -1,13 +1,13 @@
 from jinja2 import Template
 
-from custom_nodes.ComfyUI_LLM.constant import IN_ICON
+from custom_nodes.ComfyUI_LLM.constant import IN_ICON, OUT_ICON
 from custom_nodes.ComfyUI_LLM.route_data import RouteData, is_stopped, get_node_id
 
 
 class PromptBuilder:
     CATEGORY = "LLM/prompts"
     RETURN_TYPES = ("ROUTE_DATA", "STRING")
-    RETURN_NAMES = ("_out", "prompt")
+    RETURN_NAMES = (OUT_ICON, "prompt")
     FUNCTION = "execute"
 
     @classmethod
