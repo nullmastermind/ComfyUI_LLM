@@ -3,7 +3,7 @@ from typing import Any, Dict, Tuple
 
 class MergeTextOutput:
     RETURN_TYPES = ("STRING",)
-    RETURN_NAMES = ("STRING",)
+    RETURN_NAMES = ("text",)
     FUNCTION = "run"
     CATEGORY = "LLM/utils"
 
