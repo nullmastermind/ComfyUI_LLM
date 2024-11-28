@@ -4,25 +4,24 @@ class OutputText:
     RETURN_NAMES = ("text",)
     FUNCTION = "execute"
     OUTPUT_NODE = True
-    INPUT_IS_LIST = True
     OUTPUT_IS_LIST = (True,)
 
     @classmethod
     def INPUT_TYPES(cls):
         return {
-            "required": {
-                "text": ("STRING", {"default": "", "forceInput": True}),
-            },
+            "required": {},
             "hidden": {
                 "unique_id": "UNIQUE_ID",
                 "extra_pnginfo": "EXTRA_PNGINFO",
             },
         }
 
-    def execute(self, **kwargs):
-        text = kwargs.get("text")
-        unique_id = kwargs.get("unique_id")
-        extra_pnginfo = kwargs.get("extra_pnginfo")
+    def execute(self, unique_id=None, extra_pnginfo=None, **kwargs):
+        text_array = kwargs.values()
+
+        # Filter and join valid strings from the array
+        text = "\n".join(str(t) for t in text_array if t is not None and str(t).strip())
+        text = [text]
 
         # Early return if no workflow info provided
         if unique_id is None or extra_pnginfo is None:
