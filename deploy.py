@@ -142,15 +142,16 @@ if __name__ == "__main__":
             exit(1)
     save_cache(cache)
 
-    # Install requirements in container
-    print("\n[bold]Installing requirements...[/bold]")
-    try:
-        cmd = f"docker exec {container_id} sh -c 'cd /app/custom_nodes/ComfyUI_LLM && python -m pip install -r requirements.txt'"
-        subprocess.run(cmd, shell=True, check=True)
-        print("[green]Requirements installed successfully![/green]")
-    except subprocess.CalledProcessError as e:
-        print(f"[red]Error installing requirements: {e}[/red]")
-        exit(1)
+    # Install requirements in container only if requirements.txt was deployed
+    if any(file.endswith("requirements.txt") for file in file_list):
+        print("\n[bold]Installing requirements...[/bold]")
+        try:
+            cmd = f"docker exec {container_id} sh -c 'cd /app/custom_nodes/ComfyUI_LLM && python -m pip install -r requirements.txt'"
+            subprocess.run(cmd, shell=True, check=True)
+            print("[green]Requirements installed successfully![/green]")
+        except subprocess.CalledProcessError as e:
+            print(f"[red]Error installing requirements: {e}[/red]")
+            exit(1)
 
     print("[green]Deployment completed successfully![/green]")
 
