@@ -1,2 +1,2 @@
-OUT_ICON = " "
-IN_ICON = " "
+OUT_ICON = "\u200B"
+IN_ICON = "\u200B"
