@@ -15,6 +15,7 @@ class OpenAINode:
     RETURN_NAMES = (OUT_ICON, "answer", "system_prompt")
     FUNCTION = "execute"
     OUTPUT_NODE = True
+    INPUT_IS_LIST = False
 
     @classmethod
     def INPUT_TYPES(cls):
