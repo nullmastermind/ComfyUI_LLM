@@ -17,9 +17,7 @@ class QuestionClassifier:
     RETURN_TYPES = ("ROUTE_DATA", "STRING") + tuple(
         "ROUTE_DATA" for _ in range(MAX_QUESTIONS)
     )
-    RETURN_NAMES = (OUT_ICON, "class") + tuple(
-        f"{i+1} {OUT_ICON}" for i in range(MAX_QUESTIONS)
-    )
+    RETURN_NAMES = (OUT_ICON, "class") + tuple(f"{i+1}" for i in range(MAX_QUESTIONS))
     FUNCTION = "execute"
     OUTPUT_NODE = True
 
