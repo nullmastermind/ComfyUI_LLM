@@ -12,22 +12,14 @@ WEB_DIRECTORY = "./web"
 
 NODE_CLASS_MAPPINGS = {
     "OpenAI Model": OpenAIModelNode,
-    "--dynamic --type=STRING --label=text OutputText": OutputText,
+    "Output Text": OutputText,
     "Input Text": InputText,
     "Any To Text": AnyToString,
     "Start": StartNode,
     "OpenAI": OpenAINode,
     "Prompt Builder": PromptBuilder,
-    "--dynamic --type=STRING --label=text MergeTextOutput": MergeTextOutput,
-    "--dynamic --type=STRING --label=question QuestionClassifier": QuestionClassifier,
-    # "Dynamic IMAGE Node": DynamicNode,
+    "Merge Text Output": MergeTextOutput,
+    "Question Classifier": QuestionClassifier,
 }
 
-NODE_DISPLAY_NAME_MAPPINGS = {
-    # "Dynamic IMAGE Node": "Dynamic Node",
-    "--dynamic --type=STRING --label=text OutputText": "Output Text",
-    "--dynamic --type=STRING --label=text MergeTextOutput": "Merge Text",
-    "--dynamic --type=STRING --label=question QuestionClassifier": "Question Classifier",
-}
-
-__all__ = ["NODE_CLASS_MAPPINGS", "NODE_DISPLAY_NAME_MAPPINGS"]
+__all__ = ["NODE_CLASS_MAPPINGS"]

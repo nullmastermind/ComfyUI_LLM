@@ -1,6 +1,6 @@
 class OutputText:
     CATEGORY = "LLM/outputs"
-    RETURN_TYPES = ("STRING",)
+    RETURN_TYPES = ("OUTPUT_TEXT",)
     RETURN_NAMES = ("text",)
     FUNCTION = "execute"
     OUTPUT_NODE = True
@@ -9,7 +9,18 @@ class OutputText:
     @classmethod
     def INPUT_TYPES(cls):
         return {
-            "required": {},
+            "required": {
+                "text": (
+                    "STRING",
+                    {
+                        "defaultInput": True,
+                        "requireInput": True,
+                        "default": "",
+                        "multiline": True,
+                    },
+                ),
+            },
+            "optional": {},
             "hidden": {
                 "unique_id": "UNIQUE_ID",
                 "extra_pnginfo": "EXTRA_PNGINFO",

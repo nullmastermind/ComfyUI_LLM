@@ -11,6 +11,14 @@ class MergeTextOutput:
     def INPUT_TYPES(cls) -> Dict[str, dict]:
         return {
             "required": {
+                "text": (
+                    "STRING",
+                    {
+                        "defaultInput": True,
+                        "requireInput": True,
+                        "dynamic": True,
+                    },
+                ),
                 "delimiter": ("STRING", {"default": "\\n", "multiline": False}),
             },
             "optional": {},
