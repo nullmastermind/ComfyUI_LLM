@@ -1,2 +1,2 @@
-OUT_ICON = "≫"
-IN_ICON = "≫"
+OUT_ICON = " "
+IN_ICON = " "
