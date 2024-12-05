@@ -32,11 +32,21 @@ class QuestionClassifier:
                 "model": ("LLM_OPENAI_MODEL",),
                 "query": (
                     "STRING",
-                    {"default": "", "multiline": True, "defaultInput": True},
+                    {"default": "", "multiline": False, "defaultInput": True},
+                ),
+                "question": (
+                    "STRING",
+                    {
+                        "default": "",
+                        "multiline": True,
+                        "defaultInput": True,
+                        "requireInput": True,
+                        "dynamic": True,
+                    },
                 ),
                 "instructions": (
                     "STRING",
-                    {"default": "", "multiline": True},
+                    {"default": "", "multiline": False},
                 ),
                 "memory": ("BOOLEAN", {"default": True}),
             }

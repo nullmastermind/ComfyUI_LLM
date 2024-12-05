@@ -4,7 +4,7 @@ from typing import Any, Dict, Tuple
 class MergeTextOutput:
     RETURN_TYPES = ("STRING",)
     RETURN_NAMES = ("text",)
-    FUNCTION = "run"
+    FUNCTION = "execute"
     CATEGORY = "LLM/utils"
 
     @classmethod
@@ -24,7 +24,7 @@ class MergeTextOutput:
             "optional": {},
         }
 
-    def run(self, delimiter: str, **kw) -> Tuple[Any | None]:
+    def execute(self, delimiter: str, **kw) -> Tuple[Any | None]:
         delimiter = delimiter.replace("\\n", "\n")
         value = delimiter.join(v for v in kw.values() if v)
         return (value,)
