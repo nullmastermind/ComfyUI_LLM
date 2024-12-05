@@ -21,7 +21,7 @@ class OpenAINode:
         return {
             "required": {
                 IN_ICON: ("ROUTE_DATA", {"requireInput": True}),
-                "node_id": ("STRING", {"default": ""}),
+                "node_id": ("STRING", {"default": "open_ai"}),
                 "model": ("LLM_OPENAI_MODEL",),
                 "system_prompt": (
                     "STRING",

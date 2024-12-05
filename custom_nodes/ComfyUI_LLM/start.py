@@ -16,7 +16,7 @@ class StartNode:
         return {
             "required": {
                 "node_id": ("STRING", {"default": "start"}),
-                "conversation_id": ("STRING", {"default": "", "multiline": False}),
+                "conversation_id": ("STRING", {"default": ""}),
                 "query": (
                     "STRING",
                     {

@@ -26,12 +26,17 @@ class QuestionClassifier:
         return {
             "required": {
                 IN_ICON: ("ROUTE_DATA", {"requireInput": True}),
-                "node_id": ("STRING", {"default": ""}),
+                "node_id": ("STRING", {"default": "question_classifier"}),
                 "model": ("LLM_OPENAI_MODEL",),
                 "query": (
                     "STRING",
-                    {"default": "", "multiline": False, "defaultInput": True},
+                    {"default": "", "multiline": True, "defaultInput": True},
                 ),
+                "instructions": (
+                    "STRING",
+                    {"default": "", "multiline": True},
+                ),
+                "memory": ("BOOLEAN", {"default": True}),
                 "question": (
                     "STRING",
                     {
@@ -42,11 +47,6 @@ class QuestionClassifier:
                         "dynamic": True,
                     },
                 ),
-                "instructions": (
-                    "STRING",
-                    {"default": "", "multiline": False},
-                ),
-                "memory": ("BOOLEAN", {"default": True}),
             }
         }
 

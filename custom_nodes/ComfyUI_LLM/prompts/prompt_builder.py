@@ -15,7 +15,7 @@ class PromptBuilder:
         return {
             "required": {
                 IN_ICON: ("ROUTE_DATA", {"requireInput": True}),
-                "node_id": ("STRING", {"default": ""}),
+                "node_id": ("STRING", {"default": "prompt_builder"}),
                 "prompt": ("STRING", {"multiline": True, "default": ""}),
             }
         }
