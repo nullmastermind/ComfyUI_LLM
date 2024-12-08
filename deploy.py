@@ -60,17 +60,10 @@ def copy_file_to_container(container_id, file_path, cache):
 
 
 if __name__ == "__main__":
-    # Export requirements.txt from poetry
+    # Export requirements.txt from uv
     subprocess.run(
-        [
-            "poetry",
-            "export",
-            "-f",
-            "requirements.txt",
-            "--output",
-            "custom_nodes/ComfyUI_LLM/requirements.txt",
-            "--without-hashes",
-        ],
+        "uv export > custom_nodes/ComfyUI_LLM/requirements.txt",
+        shell=True,
         check=True,
     )
 
@@ -93,7 +86,14 @@ if __name__ == "__main__":
     file_list = []
     for root, dirs, files in os.walk("."):
         # Skip directories that shouldn't be deployed
-        excluded_dirs = {".git", ".idea", "__deploy_cache__", "deploy.py"}
+        excluded_dirs = {
+            ".git",
+            ".idea",
+            "__deploy_cache__",
+            "deploy.py",
+            ".venv",
+            ".cadence",
+        }
         if any(excluded in root for excluded in excluded_dirs):
             continue
         for file in files:
