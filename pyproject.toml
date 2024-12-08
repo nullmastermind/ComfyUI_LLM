@@ -1,19 +1,12 @@
-[tool.poetry]
+[project]
 name = "comfyui-llm"
 version = "0.1.0"
-description = ""
-authors = ["Dongnv"]
-license = "CMC"
+description = "Add your description here"
 readme = "README.md"
-
-[tool.poetry.dependencies]
-python = "^3.12"
-rich = "^13.9.4"
-requests = "^2.32.3"
-openai = "^1.55.1"
-jinja2 = "^3.1.4"
-
-
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+requires-python = ">=3.12"
+dependencies = [
+    "jinja2>=3.1.4",
+    "openai>=1.57.0",
+    "requests>=2.32.3",
+    "rich>=13.9.4",
+]
